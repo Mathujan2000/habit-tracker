@@ -27,6 +27,20 @@ jobs:
       - name: Set up environment
         run: cp .env.example .env && php artisan key:generate
 
+      # New step: Setup Node.js for Vite
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # New step: Install Node.js dependencies
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      # New step: Build assets with Vite
+      - name: Build assets
+        run: npm run build
+
       - name: Lint code (PHP CodeSniffer)
         run: ./vendor/bin/phpcs --standard=PSR12 app/
 
