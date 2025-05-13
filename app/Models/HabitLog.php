@@ -16,4 +16,3 @@ class HabitLog extends Model
         return $this->belongsTo(Habit::class);
     }
 }
-

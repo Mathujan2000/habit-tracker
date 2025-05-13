@@ -16,4 +16,11 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_home_redirects_to_habits()
+    {
+        $response = $this->get('/');
+        $response->assertRedirect('/habits');
+    }
+
 }

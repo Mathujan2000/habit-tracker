@@ -16,4 +16,3 @@ class Habit extends Model
         return $this->hasMany(HabitLog::class);
     }
 }
-
