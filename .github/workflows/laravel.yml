@@ -2,34 +2,37 @@ name: Laravel CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repo klonen
+      - name: Checkout project
         uses: actions/checkout@v3
 
-      - name: PHP en Composer instellen
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           extensions: mbstring, bcmath, pdo
           coverage: xdebug
 
-      - name: Composer dependencies installeren
+      - name: Install Composer dependencies
         run: composer install --no-progress --prefer-dist
 
-      - name: Code Linter draaien
+      - name: Set up environment
+        run: cp .env.example .env && php artisan key:generate
+
+      - name: Lint code (PHP CodeSniffer)
         run: ./vendor/bin/phpcs --standard=PSR12 app/
 
-      - name: Tests uitvoeren
+      - name: Run tests
         run: php artisan test
 
-      - name: Simuleer release
+      - name: Simulate release
         if: github.ref == 'refs/heads/main'
-        run: echo "Release klaar: v1.0.0"
+        run: echo "✅ Release completed (v1.0.0)"
