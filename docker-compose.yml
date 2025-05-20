@@ -17,13 +17,3 @@ services:
             DB_DATABASE: laravel
             DB_USERNAME: laravel
             DB_PASSWORD: secret
-
-    db:
-        image: mysql:8.0
-        ports:
-            - "3307:3306"  # Host port 3307 -> Container port 3306
-        environment:
-            MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: laravel
-            MYSQL_USER: laravel
-            MYSQL_PASSWORD: secret
