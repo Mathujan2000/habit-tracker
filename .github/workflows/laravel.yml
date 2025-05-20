@@ -28,7 +28,22 @@ jobs:
         run: composer install --no-progress --prefer-dist
 
       - name: Set up environment
-        run: cp .env.example .env && php artisan key:generate
+        run: |
+          cat <<EOF > .env
+          APP_NAME=Laravel
+          APP_ENV=local
+          APP_KEY=
+          APP_DEBUG=true
+          APP_URL=http://localhost
+
+          DB_CONNECTION=mysql
+          DB_HOST=127.0.0.1
+          DB_PORT=3307
+          DB_DATABASE=laravel
+          DB_USERNAME=laravel
+          DB_PASSWORD=secret
+          EOF
+          php artisan key:generate
 
       - name: Setup Node.js
         uses: actions/setup-node@v3

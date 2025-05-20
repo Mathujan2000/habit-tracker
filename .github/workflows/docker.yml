@@ -37,8 +37,22 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-progress --no-interaction --prefer-dist
 
-      - name: Copy .env
-        run: cp .env.example .env
+      - name: Create .env file
+        run: |
+          cat <<EOF > .env
+          APP_NAME=Laravel
+          APP_ENV=local
+          APP_KEY=
+          APP_DEBUG=true
+          APP_URL=http://localhost
+
+          DB_CONNECTION=mysql
+          DB_HOST=127.0.0.1
+          DB_PORT=3307
+          DB_DATABASE=laravel
+          DB_USERNAME=laravel
+          DB_PASSWORD=secret
+          EOF
 
       - name: Set Laravel App Key
         run: php artisan key:generate
