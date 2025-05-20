@@ -1,0 +1,61 @@
+name: Build, Migrate & Seed Laravel App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-seed:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: laravel
+          MYSQL_USER: laravel
+          MYSQL_PASSWORD: secret
+        ports:
+          - 3307:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --no-interaction --prefer-dist
+
+      - name: Copy .env
+        run: cp .env.example .env
+
+      - name: Set Laravel App Key
+        run: php artisan key:generate
+
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in {1..20}; do
+            if mysqladmin ping -h 127.0.0.1 -P 3307 --silent; then
+              echo "MySQL is up!"
+              break
+            fi
+            echo "Waiting for MySQL..."
+            sleep 3
+          done
+
+      - name: Run Laravel migrations
+        run: php artisan migrate --force
+
+      - name: Run Laravel seeders
+        run: php artisan db:seed --force
