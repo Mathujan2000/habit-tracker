@@ -9,8 +9,6 @@ services:
             - "8000:80"
         volumes:
             - .:/var/www/html
-        depends_on:
-            - db
         environment:
             DB_HOST: db
             DB_PORT: 3306  # Internal port remains 3306
