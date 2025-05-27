@@ -38,10 +38,6 @@ RUN composer install --no-scripts --no-autoloader --no-interaction --no-dev
 # Kopieer alle bestanden (exclude onnodige bestanden via .dockerignore)
 COPY . .
 
-# Zet rechten goed
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 775 /var/www/html/storage && \
-    chmod -R 775 /var/www/html/bootstrap/cache
 
 # Debug listing to check if .env.example exists
 RUN ls -la /var/www/html
@@ -55,10 +51,10 @@ RUN cp .env.example .env && \
 # Installeer NPM dependencies en bouw assets
 RUN npm install && npm run build
 
-RUN php artisan migrate:fresh --seed
+RUN touch database/database.sqlite \
+    && php artisan migrate:fresh --seed
 
-# Expose poort 80
-EXPOSE 80
-
-# Start Apache in foreground
-CMD ["apache2-foreground"]
+# Zet rechten goed
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 775 /var/www/html/storage && \
+    chmod -R 775 /var/www/html/bootstrap/cache
