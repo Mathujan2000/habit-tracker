@@ -2,7 +2,7 @@
 FROM php:8.2-apache
 
 # Installeer systeemafhankelijkheden en tools
-RUN apt-get update && apt-get install -y  mysql-client \
+RUN apt-get update && apt-get install -y\
     git \
     curl \
     libpng-dev \
