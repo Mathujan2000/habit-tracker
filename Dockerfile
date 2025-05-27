@@ -33,7 +33,7 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 # Installeer PHP dependencies (zonder scripts om .env issues te voorkomen)
-RUN composer install --no-scripts --no-autoloader --no-interaction --no-dev
+RUN composer install --no-scripts --no-autoloader --no-interaction
 
 # Kopieer alle bestanden (exclude onnodige bestanden via .dockerignore)
 COPY . .
