@@ -55,9 +55,6 @@ RUN cp .env.example .env && \
 # Installeer NPM dependencies en bouw assets
 RUN npm install && npm run build
 
-RUN php artisan migrate:fresh --seed
-
-
 # Expose poort 80
 EXPOSE 80
 
