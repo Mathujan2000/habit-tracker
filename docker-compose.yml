@@ -9,9 +9,4 @@ services:
             - "8000:80"
         volumes:
             - .:/var/www/html
-        environment:
-            DB_HOST: db
-            DB_PORT: 3306  # Internal port remains 3306
-            DB_DATABASE: laravel
-            DB_USERNAME: laravel
-            DB_PASSWORD: secret
+            - ./apache.conf:/etc/apache2/sites-enabled/000-default.conf
