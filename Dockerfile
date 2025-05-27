@@ -2,7 +2,7 @@
 FROM php:8.2-apache
 
 # Installeer systeemafhankelijkheden en tools
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y  mysql-client \
     git \
     curl \
     libpng-dev \
@@ -54,6 +54,8 @@ RUN cp .env.example .env && \
 
 # Installeer NPM dependencies en bouw assets
 RUN npm install && npm run build
+
+RUN php artisan migrate:fresh --seed
 
 # Expose poort 80
 EXPOSE 80
