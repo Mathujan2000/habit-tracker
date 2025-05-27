@@ -27,8 +27,4 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
 RUN npm install && npm run build
 
-RUN php artisan key:generate \
-    && php artisan config:cache \
-    && php artisan route:cache
-
 EXPOSE 80
