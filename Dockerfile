@@ -6,7 +6,7 @@ RUN a2enmod rewrite
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     zip unzip curl git libzip-dev ca-certificates \
-    && docker-php-ext-install zip pdo_mysql
+    && docker-php-ext-install zip pdo pdo_mysql
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -23,7 +23,8 @@ COPY . .
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+    && chmod -R 755 /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Install PHP dependencies with Composer
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
