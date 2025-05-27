@@ -43,6 +43,9 @@ RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 775 /var/www/html/storage && \
     chmod -R 775 /var/www/html/bootstrap/cache
 
+# Debug listing to check if .env.example exists
+RUN ls -la /var/www/html
+
 # Environment voorbereiden
 RUN cp .env.example .env && \
     composer dump-autoload --optimize && \
