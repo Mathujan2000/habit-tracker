@@ -25,10 +25,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf && \
     a2enmod rewrite
 
-# Zet rechten goed
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 775 /var/www/html/storage && \
-    chmod -R 775 /var/www/html/bootstrap/cache
 
 # Werkdirectory instellen
 WORKDIR /var/www/html
@@ -41,6 +37,11 @@ RUN composer install --no-scripts --no-autoloader --no-interaction --no-dev
 
 # Kopieer alle bestanden (exclude onnodige bestanden via .dockerignore)
 COPY . .
+
+# Zet rechten goed
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 775 /var/www/html/storage && \
+    chmod -R 775 /var/www/html/bootstrap/cache
 
 # Environment voorbereiden
 RUN cp .env.example .env && \
