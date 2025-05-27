@@ -1,42 +1,60 @@
+# Gebruik een officiële Apache + PHP base image
 FROM php:8.2-apache
 
-# Enable mod_rewrite
-RUN a2enmod rewrite
+# Installeer systeemafhankelijkheden en tools
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    nodejs \
+    npm && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set ServerName to avoid Apache warnings
+# Installeer PHP extensies
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    zip unzip curl git libzip-dev ca-certificates npm nodejs \
-    && docker-php-ext-install zip pdo pdo_mysql \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Installeer Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Zet Apache configuratie
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf && \
+    a2enmod rewrite
 
-# Set working directory
+# Werkdirectory instellen
 WORKDIR /var/www/html
 
-# Copy Laravel app code
+# Kopieer eerst alleen de composer bestanden voor efficiënte caching
+COPY composer.json composer.lock ./
+
+# Installeer PHP dependencies (zonder scripts om .env issues te voorkomen)
+RUN composer install --no-scripts --no-autoloader --no-interaction --no-dev
+
+# Kopieer alle bestanden (exclude onnodige bestanden via .dockerignore)
 COPY . .
 
-# Copy custom Apache config (make sure apache.conf is next to Dockerfile)
-COPY apache.conf /etc/apache2/sites-enabled/000-default.conf
+# Environment voorbereiden
+RUN cp .env.example .env && \
+    composer dump-autoload --optimize && \
+    php artisan key:generate && \
+    php artisan config:cache
 
-# Set permissions for Laravel storage and cache
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Install PHP dependencies with Composer
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-
-# Install npm dependencies and build assets
+# Installeer NPM dependencies en bouw assets
 RUN npm install && npm run build
 
-# Expose port 80
+RUN php artisan migrate:fresh --seed
+
+# Zet rechten goed
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 775 /var/www/html/storage && \
+    chmod -R 775 /var/www/html/bootstrap/cache
+
+# Expose poort 80
 EXPOSE 80
 
-# Run Apache in the foreground
+# Start Apache in foreground
 CMD ["apache2-foreground"]
